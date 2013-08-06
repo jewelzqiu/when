@@ -1,0 +1,25 @@
+# incremental data. DO NOT EDIT.
+# format is <lastModified> <length> <SHA-1> <path>
+# Encoding is UTF-8
+1375754948000 324 aa1f5f1723de9aee2669dc44a26fbc0ce776d35f /home/jewelzqiu/git/when/When/src/main/res/values-v11/styles.xml
+1375754948000 7721 39b0f5a0570da92f471225402ad0ea6de30bf2be /home/jewelzqiu/git/when/When/src/main/res/drawable-hdpi/ic_launcher.png
+1375754948000 24654 696bbbc63d2250ef7d3373f2d602e604acd13d8c /home/jewelzqiu/git/when/When/src/main/res/drawable-xxhdpi/ic_launcher.png
+1375754949000 181 84de2797380184d8b39af6f829afb092fb956173 /home/jewelzqiu/git/when/When/src/main/res/values-sw600dp/dimens.xml
+1375756197000 176 ded07eb22d2166dc4dddb6e936a07a16e1ee67c6 /home/jewelzqiu/git/when/When/src/main/res/values/arrays.xml
+1375754948000 680 c76f4caaa7a8dfe9727fa93001b3aee3b22d6716 /home/jewelzqiu/git/when/When/src/main/res/values/styles.xml
+1366402019000 2838 aff2046e82373610678f3529a312cdc628663e30 /home/jewelzqiu/git/when/When/src/main/res/drawable-mdpi/ic_drawer.png
+1375754948000 3769 eec07752d40e268ed7f4a1730acc77ab1e40aeb0 /home/jewelzqiu/git/when/When/src/main/res/drawable-mdpi/ic_launcher.png
+1366402019000 171 8721f883e0582d7238539ec38ad1bb12b2dcda7b /home/jewelzqiu/git/when/When/src/main/res/drawable-hdpi/drawer_shadow.9.png
+1366402019000 182 36e61eabf32cbb148b902fb8ac90ba5aca3aaac7 /home/jewelzqiu/git/when/When/src/main/res/drawable-xhdpi/drawer_shadow.9.png
+1375756799000 272 c4cc941216dfdb24a95a991a591cc6d82deeb804 /home/jewelzqiu/git/when/When/src/main/res/values/strings.xml
+1375754948000 12329 a8301606e15d4b6dccdd775cc273cfc51a552645 /home/jewelzqiu/git/when/When/src/main/res/drawable-xhdpi/ic_launcher.png
+1375754949000 211 4e1904afba59d31e5cd6133f6a4c360fa9a5913f /home/jewelzqiu/git/when/When/src/main/res/values/dimens.xml
+1375754948000 381 b129b276e01126de5b3b753572ac67cbfc19454c /home/jewelzqiu/git/when/When/src/main/res/values-v14/styles.xml
+1366402019000 158 978aa2929e2a1b96da5c9f33cbc168f974d76cae /home/jewelzqiu/git/when/When/src/main/res/drawable-mdpi/drawer_shadow.9.png
+1375754949000 254 25b6404e44acb50c82590049639d4fb5fefbac8e /home/jewelzqiu/git/when/When/src/main/res/values-sw720dp-land/dimens.xml
+1375754949000 244 045ff451db7cd8e61285502b8c9bbf7405f2078d /home/jewelzqiu/git/when/When/src/main/res/menu/main.xml
+1375755324000 2103 4aea3b715d37ab874b62056b1be6f756222404e6 /home/jewelzqiu/git/when/When/src/main/res/layout/activity_main.xml
+1375757405000 487 87eb401fc7e41c2670940b0f7208d748994a5128 /home/jewelzqiu/git/when/When/src/main/res/layout/fragment_events.xml
+1366402019000 2855 be4ec95ce2dc39b65f74a93565ea605589f29024 /home/jewelzqiu/git/when/When/src/main/res/drawable-xhdpi/ic_drawer.png
+1366402019000 2843 84b92057e476ced3a5b2e74b457a6cda5c9fc306 /home/jewelzqiu/git/when/When/src/main/res/drawable-hdpi/ic_drawer.png
+1375756354000 1186 d5ddd4b084f8f548006eed31a91e9d04225681ad /home/jewelzqiu/git/when/When/src/main/res/layout/drawer_list_item.xml
