@@ -121,6 +121,11 @@ Connection changed
                 qualifiers=""
                 type="layout" />
             <file
+                name="time_events_list_item"
+                path="/home/jewelzqiu/git/when/When/src/main/res/layout/time_events_list_item.xml"
+                qualifiers=""
+                type="layout" />
+            <file
                 name="fragment_events"
                 path="/home/jewelzqiu/git/when/When/src/main/res/layout/fragment_events.xml"
                 qualifiers=""
@@ -128,6 +133,11 @@ Connection changed
             <file
                 name="activity_main"
                 path="/home/jewelzqiu/git/when/When/src/main/res/layout/activity_main.xml"
+                qualifiers=""
+                type="layout" />
+            <file
+                name="events_list_item"
+                path="/home/jewelzqiu/git/when/When/src/main/res/layout/events_list_item.xml"
                 qualifiers=""
                 type="layout" />
             <file

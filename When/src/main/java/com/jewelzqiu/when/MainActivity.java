@@ -126,7 +126,7 @@ public class MainActivity extends Activity {
     }
 
     private void selectItem(int position) {
-        Fragment fragment = new EventsFragment();
+        Fragment fragment = new EventsFragment(this);
         Bundle args = new Bundle();
         args.putInt(EventsFragment.ARG_TRIGGER_NUMBER, position);
         fragment.setArguments(args);
