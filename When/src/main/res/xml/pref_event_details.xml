@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+            android:key="@string/key_trigger"
+            android:title="@string/trigger"
+            android:entries="@array/triggers_entries"
+            android:entryValues="@array/triggers_values"/>
+
+    <ListPreference
+            android:key="@string/key_action"
+            android:title="@string/action"
+            android:entries="@array/actions_entries"
+            android:entryValues="@array/actions_values"/>
+
+    <Preference
+            android:key="@string/key_time"
+            android:title="@string/time"/>
+
+    <SwitchPreference
+            android:key="@string/key_repeat"
+            android:title="@string/repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/sunday"
+            android:title="@string/sunday"
+            android:dependency="@string/key_repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/monday"
+            android:title="@string/monday"
+            android:dependency="@string/key_repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/tuesday"
+            android:title="@string/tuesday"
+            android:dependency="@string/key_repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/wednesday"
+            android:title="@string/wednesday"
+            android:dependency="@string/key_repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/thursday"
+            android:title="@string/thursday"
+            android:dependency="@string/key_repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/friday"
+            android:title="@string/friday"
+            android:dependency="@string/key_repeat"/>
+
+    <CheckBoxPreference
+            android:key="@string/saturday"
+            android:title="@string/saturday"
+            android:dependency="@string/key_repeat"/>
+
+</PreferenceScreen>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="title_activity_event_details">Event Details</string>
+
+    <!-- Strings related to Settings -->
+    <string name="trigger">Trigger</string>
+    <string name="action">Action</string>
+    <string name="time">Time</string>
+    <string name="repeat">Repeat</string>
+
+    <string name="key_trigger">key_trigger</string>
+    <string name="key_action">key_action</string>
+    <string name="key_time">key_time</string>
+    <string name="key_repeat">key_repeat</string>
+
+    <string name="sunday">Sunday</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+
+</resources>

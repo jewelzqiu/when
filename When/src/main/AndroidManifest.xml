@@ -22,6 +22,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.jewelzqiu.when.EventDetailsActivity"
+            android:label="@string/title_activity_event_details" >
+        </activity>
     </application>
 
 </manifest>

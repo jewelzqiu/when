@@ -4,6 +4,9 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,6 +28,8 @@ public class EventsFragment extends Fragment {
     private EventsAdapter mAdapter;
     private Context mContext;
 
+    private int mEventType;
+
     public EventsFragment(Context context) {
         mContext = context;
     }
@@ -32,8 +37,8 @@ public class EventsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ListView rootView = (ListView) inflater.inflate(R.layout.fragment_events, container, false);
-        int i = getArguments().getInt(ARG_TRIGGER_NUMBER);
-        String trigger = getResources().getStringArray(R.array.triggers_array)[i];
+        mEventType = getArguments().getInt(ARG_TRIGGER_NUMBER);
+        String trigger = getResources().getStringArray(R.array.triggers_entries)[mEventType];
 
         ArrayList<Event> list = new ArrayList<Event>();
         Event event1 = new Event(trigger, "action1");
@@ -51,7 +56,19 @@ public class EventsFragment extends Fragment {
         });
 
         getActivity().setTitle(trigger);
+        setHasOptionsMenu(true);
         return rootView;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add:
+                System.out.println("add");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private class EventsAdapter extends BaseAdapter {

@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTriggerTitles = getResources().getStringArray(R.array.triggers_array);
+        mTriggerTitles = getResources().getStringArray(R.array.triggers_entries);
         mDrawerTitle = getResources().getString(R.string.select_trigger);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -79,6 +79,9 @@ public class MainActivity extends Activity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(IS_FIRST_RUN, false);
                 editor.commit();
+
+                // create database
+                new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
             }
         }
     }
@@ -108,13 +111,18 @@ public class MainActivity extends Activity {
             return true;
         }
 
-        switch (item.getItemId()) {
-            case R.id.action_settings:
+//        switch (item.getItemId()) {
+//            case R.id.add:
+//                System.out.println("add");
+//                return true;
+//            case R.id.action_settings:
+//
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -126,7 +134,13 @@ public class MainActivity extends Activity {
     }
 
     private void selectItem(int position) {
-        Fragment fragment = new EventsFragment(this);
+        Fragment fragment;
+        if (position == 0) {
+            fragment = new TimeEventsFragment(this);
+        } else {
+            fragment = new EventsFragment(this);
+        }
+//        fragment = new EventsFragment(this);
         Bundle args = new Bundle();
         args.putInt(EventsFragment.ARG_TRIGGER_NUMBER, position);
         fragment.setArguments(args);

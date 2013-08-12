@@ -2,18 +2,69 @@
 <resources>
 
     <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/arrays.xml -->
-    <array name="triggers_array">
+    <array name="actions_entries">
+        <item>Airplane mode on</item>
+        <item>Airplane mode off</item>
+    </array>
+
+    <string-array name="actions_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="days">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+    <string-array name="days_of_week">
+        <item>SUN</item>
+        <item>MON</item>
+        <item>TUE</item>
+        <item>WED</item>
+        <item>THU</item>
+        <item>FRI</item>
+        <item>SAT</item>
+    </string-array>
+    <string-array name="triggers_entries">
         <item>Time</item>
         <item>Connection changed</item>
-    </array>
+    </string-array>
+    <string-array name="triggers_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
     <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/dimens.xml -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/strings_activity_event_details.xml -->
+    <string name="action">Action</string>
     <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/strings.xml -->
     <string name="action_settings">Settings</string>
     <string name="app_name">When</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="every_day">Every day</string>
+    <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/strings_activity_event_details.xml -->
+    <string name="friday">Friday</string>
+    <string name="key_action">key_action</string>
+    <string name="key_repeat">key_repeat</string>
+    <string name="key_time">key_time</string>
+    <string name="key_trigger">key_trigger</string>
+    <string name="monday">Monday</string>
+    <string name="repeat">Repeat</string>
+    <string name="saturday">Saturday</string>
+    <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/strings.xml -->
     <string name="select_trigger">Select Trigger</string>
+    <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/strings_activity_event_details.xml -->
+    <string name="sunday">Sunday</string>
+    <string name="thursday">Thursday</string>
+    <string name="time">Time</string>
+    <string name="title_activity_event_details">Event Details</string>
+    <string name="trigger">Trigger</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
     <!-- From: file:/home/jewelzqiu/git/when/When/src/main/res/values/styles.xml -->
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
