@@ -1,13 +1,21 @@
 package com.jewelzqiu.when;
 
+import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.TimePicker;
 
+import java.util.Calendar;
 import java.util.Formatter;
 
 /**
@@ -32,14 +40,17 @@ public class EventDetailsActivity extends PreferenceActivity implements
 
     private int mEventType;
     private boolean mIsAddingEvent;
+    private int mHour = -1;
     private int mMinute = -1;
-    private int mSecond = -1;
 
     public static final String ADD_NEW_EVENT = "add";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         addPreferencesFromResource(R.xml.pref_event_details);
         mIsAddingEvent = getIntent().getBooleanExtra(ADD_NEW_EVENT, true);
@@ -68,6 +79,9 @@ public class EventDetailsActivity extends PreferenceActivity implements
         String[] triggers = getResources().getStringArray(R.array.triggers_entries);
         mTriggerPreference.setValueIndex(mEventType);
         mTriggerPreference.setSummary(triggers[mEventType]);
+        if (mIsAddingEvent) {
+            mActionPreference.setValue("-1");
+        }
     }
 
     @Override
@@ -83,6 +97,75 @@ public class EventDetailsActivity extends PreferenceActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.details, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+            case R.id.cancel:
+                finish();
+                return true;
+
+            case R.id.save:
+                DataBaseHelper DBHelper = new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
+                if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
+                    int repeat_mask = 0;
+                    for (int i = 0; i < 7; i++) {
+                        if (mDaysPreference[i].isEnabled() && mDaysPreference[i].isChecked()) {
+                            repeat_mask |= TimeEventsFragment.DAY_MASK[i];
+                        }
+                    }
+                    DBHelper.addTimeEvent(mHour, mMinute,
+                            Integer.parseInt(mActionPreference.getValue()), repeat_mask);
+                } else {
+                    DBHelper.addEvent(mEventType, Integer.parseInt(mActionPreference.getValue()));
+                }
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        if (preference == mTimePreference) {
+            if (mHour == -1 || mMinute == -1) {
+                Calendar calendar = Calendar.getInstance();
+                mHour = calendar.get(Calendar.HOUR_OF_DAY);
+                mMinute = calendar.get(Calendar.MINUTE);
+            }
+            ContentResolver cv = getContentResolver();
+            String timeFormat = Settings.System.getString(cv, Settings.System.TIME_12_24);
+            boolean is24HourFormat;
+            if (timeFormat != null && timeFormat.equals("24")) {
+                is24HourFormat = true;
+            } else {
+                is24HourFormat = false;
+            }
+            new TimePickerDialog(this, new OnEventTimeSetListener(), mHour, mMinute, is24HourFormat).show();
+            return true;
+        }
+        return super.onPreferenceTreeClick(preferenceScreen, preference);
+    }
+
+    class OnEventTimeSetListener implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            mHour = hourOfDay;
+            mMinute = minute;
+            String time = new Formatter().format("%02d:%02d", mHour, mMinute).toString();
+            mTimePreference.setSummary(time);
+        }
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         String[] triggers = getResources().getStringArray(R.array.triggers_entries);
         String[] actions = getResources().getStringArray(R.array.actions_entries);
@@ -92,12 +175,14 @@ public class EventDetailsActivity extends PreferenceActivity implements
         String action = mActionPreference.getValue();
         if (action != null) {
             index = new Integer(mActionPreference.getValue());
-            mActionPreference.setSummary(actions[index]);
+            if (index > -1) {
+                mActionPreference.setSummary(actions[index]);
+            }
         }
 
         if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
-            if (mMinute != -1 && mSecond != -1) {
-                String time = new Formatter().format("%02d:%02d", mMinute, mSecond).toString();
+            if (mMinute != -1 && mHour != -1) {
+                String time = new Formatter().format("%02d:%02d", mHour, mMinute).toString();
                 mTimePreference.setSummary(time);
             }
         }

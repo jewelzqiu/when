@@ -1,6 +1,7 @@
 package com.jewelzqiu.when;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,7 +14,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_NAME_PREFIX = "t_";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_MINUTE = "minute";
-    public static final String COLUMN_SECOND = "second";
+    public static final String COLUMN_HOUR = "hour";
     public static final String COLUMN_REPEAT = "repeat";
     public static final String COLUMN_ACTION = "action";
     public static final String COLUMN_ENABLED = "enabled";
@@ -27,20 +28,23 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        int[] trigger_values = mContext.getResources().getIntArray(R.array.triggers_values);
+        String[] trigger_values = mContext.getResources().getStringArray(R.array.triggers_values);
         for (int i = 0; i < trigger_values.length; i++) {
-            int trigger = trigger_values[i];
+            int trigger = Integer.parseInt(trigger_values[i]);
+            System.out.println(trigger);
             if (trigger == 0) { // time events
-                db.execSQL("CREATE TABLE " + TABLE_NAME_PREFIX + trigger + "(" +
+                System.out.println("time");
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME_PREFIX + trigger + "(" +
                         COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        COLUMN_HOUR + " INTEGER, " +
                         COLUMN_MINUTE + " INTEGER, " +
-                        COLUMN_SECOND + " INTEGER, " +
                         COLUMN_ACTION + " INTEGER, " +
                         COLUMN_REPEAT + " INTEGER, " +
                         COLUMN_ENABLED + " INTEGER)"
                 );
             } else {
-                db.execSQL("CREATE TABLE " + TABLE_NAME_PREFIX + trigger + "(" +
+                System.out.println("event");
+                db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME_PREFIX + trigger + "(" +
                         COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         COLUMN_ACTION + " INTEGER, " +
                         COLUMN_ENABLED + " INTEGER)"
@@ -53,5 +57,35 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    public void addTimeEvent(int hour, int minute, int action, int repeat_mask) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("INSERT INTO " + TABLE_NAME_PREFIX + 0 +
+                " (" + COLUMN_HOUR + ", " + COLUMN_MINUTE + ", " + COLUMN_ACTION + ", " +
+                        COLUMN_REPEAT + ", " + COLUMN_ENABLED + ") VALUES " +
+                "(" + hour + ", " + minute + ", " + action + ", " + repeat_mask + ", 1)"
+        );
+    }
+
+    public void addEvent(int event_type, int action) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("INSERT INTO " + TABLE_NAME_PREFIX + event_type +
+                " (" + COLUMN_ACTION + ", " + COLUMN_ENABLED + ") VALUES " +
+                "(" + action + ", 1)"
+        );
+    }
+
+    public Cursor query(int event_type) {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME_PREFIX + event_type, null);
+    }
+
+    public void setEnabled(int event_type, int id, boolean enabled) {
+        SQLiteDatabase db = getWritableDatabase();
+        int enable = enabled ? 1 : 0;
+        db.execSQL("UPDATE " + TABLE_NAME_PREFIX + event_type +
+                " SET " + COLUMN_ENABLED + " = " + enable +
+                " WHERE " + COLUMN_ID + " = " + id);
     }
 }

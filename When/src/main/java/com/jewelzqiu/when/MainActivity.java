@@ -79,9 +79,6 @@ public class MainActivity extends Activity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(IS_FIRST_RUN, false);
                 editor.commit();
-
-                // create database
-                new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
             }
         }
     }

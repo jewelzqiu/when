@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
@@ -30,7 +32,7 @@ public class TimeEventsFragment extends Fragment {
 
     public static final int EVENT_TYPE_TIME = 0;
 
-    private static final int[] DAY_MASK = {
+    public static final int[] DAY_MASK = {
             0x00000001, // SUNDAY
             0x00000002, // MONDAY
             0x00000004, // TUESDAY
@@ -39,10 +41,6 @@ public class TimeEventsFragment extends Fragment {
             0x00000020, // FRIDAY
             0x00000040, // SATURDAY
     };
-
-    public TimeEventsFragment() {
-
-    }
 
     public TimeEventsFragment(Context context) {
         mContext = context;
@@ -57,7 +55,19 @@ public class TimeEventsFragment extends Fragment {
         String trigger = getResources().getStringArray(R.array.triggers_entries)[mEventType];
         getActivity().setTitle(trigger);
         setHasOptionsMenu(true);
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
+        mAdapter = new TimeEventsAdapter(mContext, dataBaseHelper.query(mEventType), false);
+        rootView.setAdapter(mAdapter);
+        rootView.setOnItemClickListener(new OnEventClickListener());
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
+        mAdapter.changeCursor(dataBaseHelper.query(mEventType));
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -71,6 +81,14 @@ public class TimeEventsFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private class OnEventClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
         }
     }
 
@@ -91,6 +109,17 @@ public class TimeEventsFragment extends Fragment {
             viewHolder.timeView = (TextView) view.findViewById(R.id.event_time);
             viewHolder.switchView = (Switch) view.findViewById(R.id.event_switch);
             view.setTag(viewHolder);
+
+            int id = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ID));
+            view.setId(id);
+            viewHolder.switchView.setId(id);
+            viewHolder.switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
+                    dataBaseHelper.setEnabled(mEventType, buttonView.getId(), isChecked);
+                }
+            });
             return view;
         }
 
@@ -99,8 +128,8 @@ public class TimeEventsFragment extends Fragment {
             int action_no = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ACTION));
             String action = context.getResources().getStringArray(R.array.actions_entries)[action_no];
             int minute = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_MINUTE));
-            int second = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_SECOND));
-            String time = new Formatter().format("%02d:%02d", minute, second).toString();
+            int hour = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_HOUR));
+            String time = new Formatter().format("%02d:%02d", hour, minute).toString();
             int repeat = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_REPEAT));
             String repeat_day = "";
             int count = 0;

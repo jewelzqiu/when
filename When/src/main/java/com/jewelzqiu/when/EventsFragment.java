@@ -2,6 +2,8 @@ package com.jewelzqiu.when;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,11 +15,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Formatter;
 
 /**
  * Created by jewelzqiu on 8/6/13.
@@ -40,20 +44,10 @@ public class EventsFragment extends Fragment {
         mEventType = getArguments().getInt(ARG_TRIGGER_NUMBER);
         String trigger = getResources().getStringArray(R.array.triggers_entries)[mEventType];
 
-        ArrayList<Event> list = new ArrayList<Event>();
-        Event event1 = new Event(trigger, "action1");
-        Event event2 = new Event(trigger, "action2");
-        list.add(event1);
-        list.add(event2);
-
-        mAdapter = new EventsAdapter(mContext, list);
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
+        mAdapter = new EventsAdapter(mContext, dataBaseHelper.query(mEventType), false);
         rootView.setAdapter(mAdapter);
-        rootView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
+        rootView.setOnItemClickListener(new OnEventClickListener());
 
         getActivity().setTitle(trigger);
         setHasOptionsMenu(true);
@@ -61,88 +55,79 @@ public class EventsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
+        mAdapter.changeCursor(dataBaseHelper.query(mEventType));
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.add:
-                System.out.println("add");
+                Intent intent = new Intent(mContext, EventDetailsActivity.class);
+                intent.putExtra(EventDetailsActivity.ADD_NEW_EVENT, true);
+                intent.putExtra(EventsFragment.ARG_TRIGGER_NUMBER, mEventType);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private class EventsAdapter extends BaseAdapter {
-
-        private Context mContext;
-        private ArrayList<Event> eventList;
-
-        public EventsAdapter(Context context, ArrayList<Event> list) {
-            this.mContext = context;
-            eventList = list;
-        }
+    private class OnEventClickListener implements AdapterView.OnItemClickListener {
 
         @Override
-        public int getCount() {
-            if (eventList == null) {
-                return 0;
-            } else {
-                return eventList.size();
-            }
-        }
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        @Override
-        public Object getItem(int position) {
-            if (eventList == null) {
-                return null;
-            } else {
-                return eventList.get(position);
-            }
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            final Event event = (Event) getItem(position);
-            ViewHolder viewHolder;
-            if (view == null) {
-                view = LayoutInflater.from(mContext).inflate(R.layout.events_list_item, null);
-                viewHolder = new ViewHolder();
-                viewHolder.mTextView = (TextView) view.findViewById(R.id.event_text);
-                viewHolder.mSwitch = (Switch) view.findViewById(R.id.event_switch);
-                view.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) view.getTag();
-            }
-
-            viewHolder.mTextView.setText(event.getAction());
-            viewHolder.mSwitch.setChecked(event.isEnabled());
-            viewHolder.mSwitch.setId(position);
-
-//            viewHolder.mTextView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    System.out.println(((TextView) v).getText());
-//                }
-//            });
-            viewHolder.mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    int position = buttonView.getId();
-                    Event event = (Event) getItem(position);
-                    event.setEnabled(isChecked);
-                }
-            });
-
-            return view;
         }
     }
 
-    public class ViewHolder {
-        TextView mTextView;
-        Switch mSwitch;
+    private class EventsAdapter extends CursorAdapter {
+
+        private LayoutInflater mInflater;
+
+        public EventsAdapter(Context context, Cursor c, boolean autoRequery) {
+            super(context, c, autoRequery);
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            View view = mInflater.inflate(R.layout.time_events_list_item, parent, false);
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.actionView = (TextView) view.findViewById(R.id.event_text);
+            viewHolder.switchView = (Switch) view.findViewById(R.id.event_switch);
+            view.setTag(viewHolder);
+
+            int id = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ID));
+            view.setId(id);
+            viewHolder.switchView.setId(id);
+            viewHolder.switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
+                    dataBaseHelper.setEnabled(mEventType, buttonView.getId(), isChecked);
+                }
+            });
+            return view;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            int action_no = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ACTION));
+            String action = context.getResources().getStringArray(R.array.actions_entries)[action_no];
+            boolean enabled = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ENABLED)) == 1;
+
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
+            viewHolder.actionView.setText(action);
+            viewHolder.switchView.setChecked(enabled);
+        }
+    }
+
+    private class ViewHolder {
+        TextView actionView;
+        Switch switchView;
     }
 }
