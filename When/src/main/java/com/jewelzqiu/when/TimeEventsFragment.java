@@ -88,7 +88,11 @@ public class TimeEventsFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+            Intent intent  = new Intent(mContext, EventDetailsActivity.class);
+            intent.putExtra(EventDetailsActivity.ADD_NEW_EVENT, false);
+            intent.putExtra(EventsFragment.ARG_TRIGGER_NUMBER, EVENT_TYPE_TIME);
+            intent.putExtra(EventsFragment.ARG_EVENT_ID, view.getId());
+            startActivity(intent);
         }
     }
 
@@ -135,14 +139,17 @@ public class TimeEventsFragment extends Fragment {
             int count = 0;
             for (int i = 0; i < 7; i++) {
                 if ((DAY_MASK[i] & repeat) != 0) {
-                    repeat_day += context.getResources().getStringArray(R.array.days_of_week)[i] + " ";
+                    if (count > 0) {
+                        repeat_day += ", ";
+                    }
+                    repeat_day += context.getResources().getStringArray(R.array.days_of_week)[i];
                     count++;
                 }
             }
             if (count == 7) {
-                repeat_day = context.getString(R.string.every_day) + " ";
+                repeat_day = context.getString(R.string.every_day);
             }
-            time = repeat_day + time;
+            time = time + " on " + repeat_day;
             boolean enabled = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ENABLED)) == 1;
 
             ViewHolder viewHolder = (ViewHolder) view.getTag();

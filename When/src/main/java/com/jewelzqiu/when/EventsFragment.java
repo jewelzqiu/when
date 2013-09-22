@@ -29,6 +29,7 @@ import java.util.Formatter;
 public class EventsFragment extends Fragment {
 
     public static final String ARG_TRIGGER_NUMBER = "trigger_number";
+    public static final String ARG_EVENT_ID = "event_id";
     private EventsAdapter mAdapter;
     private Context mContext;
 
@@ -80,7 +81,11 @@ public class EventsFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+            Intent intent  = new Intent(mContext, EventDetailsActivity.class);
+            intent.putExtra(EventDetailsActivity.ADD_NEW_EVENT, false);
+            intent.putExtra(EventsFragment.ARG_TRIGGER_NUMBER, mEventType);
+            intent.putExtra(EventsFragment.ARG_EVENT_ID, view.getId());
+            startActivity(intent);
         }
     }
 

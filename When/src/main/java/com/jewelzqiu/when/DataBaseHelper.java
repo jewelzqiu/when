@@ -88,4 +88,34 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 " SET " + COLUMN_ENABLED + " = " + enable +
                 " WHERE " + COLUMN_ID + " = " + id);
     }
+
+    public void updateEvent(int event_type, int id, int action) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_NAME_PREFIX + event_type +
+                " SET " + COLUMN_ACTION + " = " + action +
+                " WHERE " + COLUMN_ID + " = " + id);
+    }
+
+    public void updateTimeEvent(
+            int event_type, int id, int action, int hour, int minute, int repeat) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE_NAME_PREFIX + event_type +
+                " SET " + COLUMN_ACTION + " = " + action + ", " +
+                COLUMN_HOUR + " = " + hour + ", " +
+                COLUMN_MINUTE + " = " + minute + ", " +
+                COLUMN_REPEAT + " = " + repeat +
+                " WHERE " + COLUMN_ID + " = " + id);
+    }
+
+    public void deleteEvent(int event_type, int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_NAME_PREFIX + event_type +
+                " WHERE " + COLUMN_ID + " = " + id);
+    }
+
+    public Cursor queryByID(int event_type, int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME_PREFIX + event_type +
+                " WHERE " + COLUMN_ID + " = " + id, null);
+    }
 }

@@ -3,6 +3,7 @@ package com.jewelzqiu.when;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -39,9 +40,12 @@ public class EventDetailsActivity extends PreferenceActivity implements
     private CheckBoxPreference[] mDaysPreference = new CheckBoxPreference[7];
 
     private int mEventType;
+    private int mEventID;
+    private int mActionType;
     private boolean mIsAddingEvent;
     private int mHour = -1;
     private int mMinute = -1;
+    private int mRepeat;
 
     public static final String ADD_NEW_EVENT = "add";
 
@@ -70,8 +74,10 @@ public class EventDetailsActivity extends PreferenceActivity implements
 
         if (mEventType != TimeEventsFragment.EVENT_TYPE_TIME) {
             mTimePreference.setEnabled(false);
+            mRepeatPreference.setChecked(false);
             mRepeatPreference.setEnabled(false);
             for (int i = 0; i < 7; i++) {
+                mDaysPreference[i].setChecked(false);
                 mDaysPreference[i].setEnabled(false);
             }
         }
@@ -81,6 +87,55 @@ public class EventDetailsActivity extends PreferenceActivity implements
         mTriggerPreference.setSummary(triggers[mEventType]);
         if (mIsAddingEvent) {
             mActionPreference.setValue("-1");
+            if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
+                mRepeatPreference.setChecked(false);
+                for (int i = 0; i < 7; i++) {
+                    mDaysPreference[i].setChecked(false);
+                }
+            }
+            mEventID = -1;
+        } else {
+            mEventID = getIntent().getIntExtra(EventsFragment.ARG_EVENT_ID, -1);
+            if (mEventID > -1) {
+                DataBaseHelper DBHelper = new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
+                Cursor cursor = DBHelper.queryByID(mEventType, mEventID);
+                if (cursor.moveToFirst()) {
+                    mActionType = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_ACTION));
+                    String[] actions = getResources().getStringArray(R.array.actions_entries);
+                    mActionPreference.setValueIndex(mActionType);
+                    mActionPreference.setSummary(actions[mActionType]);
+                    if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
+                        mHour = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_HOUR));
+                        mMinute = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_MINUTE));
+                        mRepeat = cursor.getInt(cursor.getColumnIndex(DataBaseHelper.COLUMN_REPEAT));
+                        String time = new Formatter().format("%02d:%02d", mHour, mMinute).toString();
+                        mTimePreference.setSummary(time);
+                        if (mRepeat == 0) {
+                            mRepeatPreference.setChecked(false);
+                        } else {
+                            mRepeatPreference.setChecked(true);
+                            for (int i = 0; i < 7; i++) {
+                                if ((TimeEventsFragment.DAY_MASK[i] & mRepeat) != 0) {
+                                    mDaysPreference[i].setChecked(true);
+                                } else {
+                                    mDaysPreference[i].setChecked(false);
+                                }
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+
+            // add event
+            mIsAddingEvent = true;
+            mActionPreference.setValue("-1");
+            if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
+                mRepeatPreference.setChecked(false);
+                for (int i = 0; i < 7; i++) {
+                    mDaysPreference[i].setChecked(false);
+                }
+            }
         }
     }
 
@@ -104,6 +159,7 @@ public class EventDetailsActivity extends PreferenceActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        DataBaseHelper DBHelper;
         switch (item.getItemId()) {
             case android.R.id.home:
             case R.id.cancel:
@@ -111,20 +167,37 @@ public class EventDetailsActivity extends PreferenceActivity implements
                 return true;
 
             case R.id.save:
-                DataBaseHelper DBHelper = new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
-                if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
-                    int repeat_mask = 0;
-                    for (int i = 0; i < 7; i++) {
-                        if (mDaysPreference[i].isEnabled() && mDaysPreference[i].isChecked()) {
-                            repeat_mask |= TimeEventsFragment.DAY_MASK[i];
-                        }
+                DBHelper = new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
+                if (mIsAddingEvent) {
+                    if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
+//                        int repeat_mask = 0;
+//                        for (int i = 0; i < 7; i++) {
+//                            if (mDaysPreference[i].isEnabled() && mDaysPreference[i].isChecked()) {
+//                                repeat_mask |= TimeEventsFragment.DAY_MASK[i];
+//                            }
+//                        }
+                        DBHelper.addTimeEvent(mHour, mMinute,
+                                Integer.parseInt(mActionPreference.getValue()), mRepeat);
+                    } else {
+                        DBHelper.addEvent(mEventType, Integer.parseInt(mActionPreference.getValue()));
                     }
-                    DBHelper.addTimeEvent(mHour, mMinute,
-                            Integer.parseInt(mActionPreference.getValue()), repeat_mask);
                 } else {
-                    DBHelper.addEvent(mEventType, Integer.parseInt(mActionPreference.getValue()));
+                    if (mEventType == TimeEventsFragment.EVENT_TYPE_TIME) {
+                        DBHelper.updateTimeEvent(mEventType, mEventID, mActionType, mHour, mMinute, mRepeat);
+                    } else {
+                        DBHelper.updateEvent(mEventType, mEventID, mActionType);
+                    }
                 }
                 finish();
+                return true;
+
+            case R.id.delete:
+                if (mEventID == -1) {
+                    finish();
+                } else {
+                    DBHelper = new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
+                    DBHelper.deleteEvent(mEventType, mEventID);
+                }
                 return true;
 
             default:
@@ -184,6 +257,12 @@ public class EventDetailsActivity extends PreferenceActivity implements
             if (mMinute != -1 && mHour != -1) {
                 String time = new Formatter().format("%02d:%02d", mHour, mMinute).toString();
                 mTimePreference.setSummary(time);
+            }
+            mRepeat = 0;
+            for (int i = 0; i < 7; i++) {
+                if (mDaysPreference[i].isEnabled() && mDaysPreference[i].isChecked()) {
+                    mRepeat |= TimeEventsFragment.DAY_MASK[i];
+                }
             }
         }
 
