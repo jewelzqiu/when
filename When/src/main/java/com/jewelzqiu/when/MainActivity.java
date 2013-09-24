@@ -1,7 +1,10 @@
 package com.jewelzqiu.when;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -17,6 +20,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+
+import java.io.IOException;
 
 public class MainActivity extends Activity {
 
@@ -81,6 +86,8 @@ public class MainActivity extends Activity {
                 editor.commit();
             }
         }
+
+        checkRoot();
     }
 
     @Override
@@ -139,7 +146,7 @@ public class MainActivity extends Activity {
         }
 //        fragment = new EventsFragment(this);
         Bundle args = new Bundle();
-        args.putInt(EventsFragment.ARG_TRIGGER_NUMBER, position);
+        args.putInt(EventsFragment.EVENT_TYPE, position);
         fragment.setArguments(args);
 
         FragmentManager fragmentManager = getFragmentManager();
@@ -156,5 +163,35 @@ public class MainActivity extends Activity {
     public void setTitle(CharSequence title) {
         mTitle = title;
         getActionBar().setTitle(mTitle);
+    }
+
+    public void checkRoot() {
+        final Runtime runtime = Runtime.getRuntime();
+        try {
+            Process process = runtime.exec("su");
+            if (process.getOutputStream() == null) {
+                showErrorDialog();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showErrorDialog();
+        }
+    }
+
+    public void showErrorDialog() {
+        new AlertDialog.Builder(this)
+                .setMessage("It seems that your device doesn't have root permission. " +
+                        "Some operations may not work.")
+                .setTitle("Sorry")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        Intent intent = new Intent(Intent.ACTION_MAIN);
+//                        intent.addCategory(Intent.CATEGORY_HOME);
+//                        startActivity(intent);
+//                        finish();
+                    }
+                })
+                .create().show();
     }
 }

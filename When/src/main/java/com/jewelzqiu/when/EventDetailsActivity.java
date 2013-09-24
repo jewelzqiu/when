@@ -58,7 +58,7 @@ public class EventDetailsActivity extends PreferenceActivity implements
 
         addPreferencesFromResource(R.xml.pref_event_details);
         mIsAddingEvent = getIntent().getBooleanExtra(ADD_NEW_EVENT, true);
-        mEventType = getIntent().getIntExtra(EventsFragment.ARG_TRIGGER_NUMBER, -1);
+        mEventType = getIntent().getIntExtra(EventsFragment.EVENT_TYPE, -1);
         mTriggerPreference = (ListPreference) findPreference(getString(R.string.key_trigger));
         mActionPreference = (ListPreference) findPreference(getString(R.string.key_action));
         mTimePreference = findPreference(getString(R.string.key_time));
@@ -95,7 +95,7 @@ public class EventDetailsActivity extends PreferenceActivity implements
             }
             mEventID = -1;
         } else {
-            mEventID = getIntent().getIntExtra(EventsFragment.ARG_EVENT_ID, -1);
+            mEventID = getIntent().getIntExtra(EventsFragment.EVENT_ID, -1);
             if (mEventID > -1) {
                 DataBaseHelper DBHelper = new DataBaseHelper(this, DataBaseHelper.DB_NAME, null, 1);
                 Cursor cursor = DBHelper.queryByID(mEventType, mEventID);

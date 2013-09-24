@@ -28,8 +28,9 @@ import java.util.Formatter;
  */
 public class EventsFragment extends Fragment {
 
-    public static final String ARG_TRIGGER_NUMBER = "trigger_number";
-    public static final String ARG_EVENT_ID = "event_id";
+    public static final String EVENT_TYPE = "event_type";
+    public static final String ACTION_TYPE = "action_type";
+    public static final String EVENT_ID = "event_id";
     private EventsAdapter mAdapter;
     private Context mContext;
 
@@ -42,7 +43,7 @@ public class EventsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ListView rootView = (ListView) inflater.inflate(R.layout.fragment_events, container, false);
-        mEventType = getArguments().getInt(ARG_TRIGGER_NUMBER);
+        mEventType = getArguments().getInt(EVENT_TYPE);
         String trigger = getResources().getStringArray(R.array.triggers_entries)[mEventType];
 
         DataBaseHelper dataBaseHelper = new DataBaseHelper(mContext, DataBaseHelper.DB_NAME, null, 1);
@@ -69,7 +70,7 @@ public class EventsFragment extends Fragment {
             case R.id.add:
                 Intent intent = new Intent(mContext, EventDetailsActivity.class);
                 intent.putExtra(EventDetailsActivity.ADD_NEW_EVENT, true);
-                intent.putExtra(EventsFragment.ARG_TRIGGER_NUMBER, mEventType);
+                intent.putExtra(EventsFragment.EVENT_TYPE, mEventType);
                 startActivity(intent);
                 return true;
             default:
@@ -83,8 +84,8 @@ public class EventsFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent  = new Intent(mContext, EventDetailsActivity.class);
             intent.putExtra(EventDetailsActivity.ADD_NEW_EVENT, false);
-            intent.putExtra(EventsFragment.ARG_TRIGGER_NUMBER, mEventType);
-            intent.putExtra(EventsFragment.ARG_EVENT_ID, view.getId());
+            intent.putExtra(EventsFragment.EVENT_TYPE, mEventType);
+            intent.putExtra(EventsFragment.EVENT_ID, view.getId());
             startActivity(intent);
         }
     }
